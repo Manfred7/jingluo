@@ -1,7 +1,7 @@
 import type { ChannelId } from '../data/channels';
 import type { Shape, Vec } from './geometry';
 
-export type ViewId = 'front' | 'arm-palmar' | 'arm-dorsal';
+export type ViewId = 'front' | 'arm-palmar' | 'arm-dorsal' | 'leg-lateral' | 'leg-medial';
 
 /** Узел хода канала: точка по id или промежуточная опора (ход между точками) */
 export type PathNode = string | Vec;

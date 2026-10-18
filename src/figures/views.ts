@@ -3,10 +3,12 @@ import placementsJson from '../data/placements.json';
 import { armDorsal } from './armDorsal';
 import { armPalmar } from './armPalmar';
 import { front } from './front';
+import { legLateral } from './legLateral';
+import { legMedial } from './legMedial';
 import { mirror, type Vec } from './geometry';
 import type { PathNode, ViewDef, ViewId } from './types';
 
-export const VIEWS: ViewDef[] = [front, armPalmar, armDorsal];
+export const VIEWS: ViewDef[] = [front, armPalmar, armDorsal, legLateral, legMedial];
 
 export const viewById = (id: ViewId) => VIEWS.find((v) => v.id === id)!;
 
