@@ -1,4 +1,4 @@
-import { across, along, add, mirrorShape, mul, normal, smoothPath, sub, unit, type Vec } from './geometry';
+import { across, along, add, len, mirrorShape, mul, normal, smoothPath, sub, unit, type Vec } from './geometry';
 import { armPalmar, L as P } from './armPalmar';
 import type { ViewDef } from './types';
 
@@ -55,7 +55,7 @@ const COMPUTED: Record<string, Vec> = {
   // Латеральный конец локтевой складки (локоть согнут), посередине между LU-5 и надмыщелком
   'LI-11': li11,
   // 7 цуней выше LI-11 на линии LI-11 — LI-15, у прикрепления дельтовидной мышцы
-  'LI-14': along(li11, li15, 7, 9.5),
+  'LI-14': along(li11, li15, 7, len(sub(li15, li11)) / CUN),
   // Вершина плеча, во впадине под акромионом (рука отведена)
   'LI-15': li15,
 
@@ -89,8 +89,8 @@ const COMPUTED: Record<string, Vec> = {
   // 2, 3 и 4 цуня выше TB-4, между лучевой и локтевой костями
   'TB-5': along(tb4, olecranon, 2, 12),
   'TB-6': along(tb4, olecranon, 3, 12),
-  // На уровне TB-6, у лучевого края локтевой кости (локтевее TB-6)
-  'TB-7': across(along(tb4, olecranon, 3, 12), tb4, olecranon, 8),
+  // На уровне TB-6, у лучевого края локтевой кости (локтевее TB-6 — на рисунке левее)
+  'TB-7': across(along(tb4, olecranon, 3, 12), tb4, olecranon, -8),
   'TB-8': along(tb4, olecranon, 4, 12),
   // Во впадине на 1 цунь выше олекранона (локоть согнут)
   'TB-10': tb10,
