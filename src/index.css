@@ -13,6 +13,10 @@
   --bad-bg: #f3e1dc;
   --shadow: 0 1px 2px rgb(60 40 20 / 6%), 0 8px 24px rgb(60 40 20 / 8%);
 
+  --figure-skin: #fffdf8;
+  --figure-line: #5a5248;
+  --figure-detail: #cbbfa9;
+
   --font-ui: 'Inter', system-ui, sans-serif;
   --font-serif: 'Noto Serif', Georgia, serif;
   --font-hanzi: 'Noto Serif SC', 'Songti SC', serif;
@@ -34,6 +38,9 @@
   --bad: #d27a6a;
   --bad-bg: #3a2522;
   --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 30%);
+  --figure-skin: #1b1a18;
+  --figure-line: #a39a8a;
+  --figure-detail: #4b453c;
   color-scheme: dark;
 }
 
@@ -234,4 +241,117 @@ button:focus-visible {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* ---------- Фигура ---------- */
+
+.figure {
+  display: block;
+  width: 100%;
+  max-height: 70dvh;
+  /* Нажатия на фигуру — свои, без прокрутки и увеличения по двойному тапу */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.figure__outline path {
+  fill: none;
+  stroke: var(--figure-line);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+.figure__fill path {
+  fill: var(--figure-skin);
+  stroke: none;
+}
+.figure__details path {
+  fill: none;
+  stroke: var(--figure-detail);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+.figure__channel {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+.figure__channel.is-active {
+  stroke: var(--accent);
+  opacity: 0.85;
+}
+.figure__hit {
+  fill: transparent;
+  cursor: pointer;
+}
+.figure__dot {
+  fill: var(--ink);
+  stroke: var(--figure-skin);
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+.figure__point.is-mirrored .figure__dot {
+  fill: var(--muted);
+}
+.figure__point.is-selected .figure__dot {
+  fill: var(--accent);
+}
+.figure__halo {
+  fill: var(--accent);
+  opacity: 0.18;
+  pointer-events: none;
+}
+.figure__label {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--muted);
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: var(--figure-skin);
+  stroke-width: 3px;
+}
+
+.atlas__hint {
+  text-align: center;
+  font-size: 0.875rem;
+}
+.point-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 4px 12px;
+  padding: 4px 4px 0;
+}
+.point-card__code {
+  font-weight: 600;
+  color: var(--accent);
+}
+.point-card__name {
+  font-family: var(--font-serif);
+  font-size: 1.375rem;
+  font-weight: 600;
+}
+.point-card__hanzi {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+.point-card__who {
+  grid-column: 1 / -1;
+  font-size: 0.8125rem;
+}
+
+button.point-row {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+}
+button.point-row:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+.point-row.is-selected .point-row__code {
+  color: var(--accent);
 }
