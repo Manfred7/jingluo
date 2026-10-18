@@ -43,6 +43,12 @@ export function ChannelQuizScreen({ pool, length, levelOf, onRecord, onFinish, o
   const [results, setResults] = useState<SessionResult[]>([]);
   const [answer, setAnswer] = useState<Answer>();
   const timerRef = useRef<number | undefined>(undefined);
+  // Актуальные значения для перехода: таймер захвачен рендером до onRecord
+  const latestRef = useRef({ channelPool, shownIds, levelOf, length, onFinish });
+
+  useEffect(() => {
+    latestRef.current = { channelPool, shownIds, levelOf, length, onFinish };
+  });
 
   useEffect(() => {
     return () => {
@@ -55,6 +61,7 @@ export function ChannelQuizScreen({ pool, length, levelOf, onRecord, onFinish, o
       window.clearTimeout(timerRef.current);
       timerRef.current = undefined;
     }
+    const { channelPool, shownIds, levelOf, length, onFinish } = latestRef.current;
     if (answered.length >= length) {
       onFinish(answered);
       return;

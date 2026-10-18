@@ -82,13 +82,15 @@ export function makeChoiceQuestion(
         : [randomFromPool];
   const options = [pointId];
   const usedIds = new Set(options);
-  const usedLabels = new Set([optionLabel(pointId, direction)]);
+  // Ключ уникальности — то, что видно на кнопке: у «→ название» это ещё и иероглиф (Цзюйляо 巨髎 / 居髎 различимы)
+  const shownAs = (id: string) => (direction.endsWith('>name') ? `${optionLabel(id, direction)} ${pointById(id)?.hanzi}` : optionLabel(id, direction));
+  const usedLabels = new Set([shownAs(pointId)]);
 
   const addCandidates = (candidates: string[]) => {
     for (const id of candidates) {
       if (options.length === 4) return;
       if (usedIds.has(id) || !pointById(id)) continue;
-      const label = optionLabel(id, direction);
+      const label = shownAs(id);
       if (usedLabels.has(label)) continue;
       options.push(id);
       usedIds.add(id);

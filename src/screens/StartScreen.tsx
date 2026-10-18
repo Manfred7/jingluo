@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { CHANNELS, type ChannelId } from '../data/channels';
 import { POINTS, pointsOf } from '../data/points';
 import { DECKS, deckMastery, isUnlocked } from '../logic/decks';
@@ -22,6 +23,11 @@ export function StartScreen({ settings, progress, onSettings, onChannel, onStart
   const mode = MODES.find((m) => m.id === settings.mode) ?? MODES[0];
   const deck = DECKS.find((d) => d.id === settings.deckId) ?? DECKS[0];
   const deckOpen = isUnlocked(deck, progress, settings.unlockAll);
+
+  // Выбранная колода закрылась (сняли «Открыть все» или сбросили прогресс) — вернуться к первой, она открыта всегда
+  useEffect(() => {
+    if (!deckOpen) onSettings({ deckId: DECKS[0].id });
+  }, [deckOpen, onSettings]);
 
   const toggleDirection = (id: QuizDirection) => {
     const has = settings.directions.includes(id);

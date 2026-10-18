@@ -66,7 +66,7 @@ export function ComposeScreen({ pool, length, levelOf, onRecord, onFinish, onExi
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat) return;
+      if (event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
       if ((event.key === 'Enter' || event.key === ' ') && answered && !ok) {
         event.preventDefault();
         advance();

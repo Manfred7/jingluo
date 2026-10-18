@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import { Figure } from '../components/Figure';
 import { CHANNELS, type ChannelId } from '../data/channels';
-import { pointById, pointsOf } from '../data/points';
+import { POINTS, pointById, pointsOf } from '../data/points';
 import { round, type Vec } from '../figures/geometry';
 import type { ViewDef, ViewId } from '../figures/types';
 import { OVERRIDES, VIEWS, placementsOf, type Overrides } from '../figures/views';
@@ -16,6 +16,15 @@ interface DragState {
   pointId: string;
   view: ViewDef;
   target: Element;
+}
+
+interface PlacementsResponse {
+  version: string;
+  overrides: Overrides;
+}
+
+interface SaveResponse {
+  version: string;
 }
 
 const isBilateral = (id: string) => pointById(id)?.bilateral ?? false;
@@ -51,6 +60,7 @@ export default function Editor() {
   const dragRef = useRef<DragState | null>(null);
   const [overrides, setOverrides] = useState<Overrides>(() => cloneOverrides(OVERRIDES));
   const [savedJson, setSavedJson] = useState(() => JSON.stringify(OVERRIDES));
+  const [version, setVersion] = useState('');
   const [viewId, setViewId] = useState<ViewId>(VIEWS[0].id);
   const [channelChoice, setChannelChoice] = useState<ChannelSelection>('LU');
   const [selectedId, setSelectedId] = useState<string>();
@@ -62,20 +72,10 @@ export default function Editor() {
   const placed = placementsOf(view, overrides, isBilateral);
   const ownPlaced = placed.filter((item) => !item.mirrored);
   const placedIds = new Set(ownPlaced.map((item) => item.pointId));
-  const availableChannels = CHANNELS.filter(
-    (channel) => view.paths[channel.id] || ownPlaced.some((item) => item.pointId.startsWith(`${channel.id}-`)),
-  );
-  const selectedChannel: ChannelSelection =
-    channelChoice !== ALL && availableChannels.some((channel) => channel.id === channelChoice) ? channelChoice : ALL;
+  const selectedChannel = channelChoice;
   const channelsToDraw: ChannelId[] =
-    selectedChannel === ALL ? availableChannels.map((channel) => channel.id) : [selectedChannel];
-  const listedPoints =
-    selectedChannel === ALL
-      ? ownPlaced.flatMap((item) => {
-          const point = pointById(item.pointId);
-          return point ? [point] : [];
-        })
-      : pointsOf(selectedChannel);
+    selectedChannel === ALL ? CHANNELS.map((channel) => channel.id) : [selectedChannel];
+  const listedPoints = selectedChannel === ALL ? POINTS : pointsOf(selectedChannel);
   const selectedPoint = selectedId ? pointById(selectedId) : undefined;
   const selectedPlaced = selectedId ? ownPlaced.find((item) => item.pointId === selectedId) : undefined;
   const selectedIsPlaced = selectedPlaced !== undefined;
@@ -157,18 +157,20 @@ export default function Editor() {
     setSaving(true);
     setNotice('');
     setError('');
-    const body = JSON.stringify(overrides);
+    const overridesJson = JSON.stringify(overrides);
     try {
       const response = await fetch('/__jingluo/placements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body,
+        body: JSON.stringify({ baseVersion: version, overrides }),
       });
       if (!response.ok) {
         const message = await response.text();
         throw new Error(message || `Ошибка сохранения: ${response.status}`);
       }
-      setSavedJson(body);
+      const result = (await response.json()) as SaveResponse;
+      setVersion(result.version);
+      setSavedJson(overridesJson);
       setNotice('Правки сохранены');
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Не удалось сохранить правки');
@@ -187,6 +189,41 @@ export default function Editor() {
       setError('Не удалось скопировать JSON');
     }
   };
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      try {
+        const response = await fetch('/__jingluo/placements');
+        if (!response.ok) {
+          const message = await response.text();
+          throw new Error(message || `Ошибка загрузки: ${response.status}`);
+        }
+        const data = (await response.json()) as PlacementsResponse;
+        if (!active) return;
+        const loaded = cloneOverrides(data.overrides);
+        setVersion(data.version);
+        setOverrides(loaded);
+        setSavedJson(JSON.stringify(loaded));
+      } catch (reason) {
+        if (active) setError(reason instanceof Error ? reason.message : 'Не удалось загрузить правки');
+      }
+    };
+    void load();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!dirty) return;
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [dirty]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -274,7 +311,7 @@ export default function Editor() {
             }}
           >
             <option value={ALL}>Все каналы</option>
-            {availableChannels.map((channel) => (
+            {CHANNELS.map((channel) => (
               <option key={channel.id} value={channel.id}>
                 {channel.code} · {channel.name}
               </option>
@@ -309,6 +346,7 @@ export default function Editor() {
               onBackgroundDown={placeSelected}
               svgRef={svgRef}
               className="editor__figure"
+              touch
               overlay={
                 <g className="editor__ghosts">
                   {ownPlaced.map((item) => {
@@ -376,7 +414,7 @@ export default function Editor() {
           )}
 
           <section className="editor__points">
-            <h2>{selectedChannel === ALL ? 'Точки на виде' : 'Точки канала'}</h2>
+            <h2>{selectedChannel === ALL ? 'Все точки' : 'Точки канала'}</h2>
             {listedPoints.length > 0 ? (
               <ul className="editor__point-list">
                 {listedPoints.map((point) => {

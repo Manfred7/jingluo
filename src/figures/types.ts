@@ -3,7 +3,7 @@ import type { Shape, Vec } from './geometry';
 
 export type ViewId = 'front' | 'back' | 'head-front' | 'head-side' | 'arm-palmar' | 'arm-dorsal' | 'leg-lateral' | 'leg-medial';
 
-/** Узел хода канала: точка по id или промежуточная опора (ход между точками) */
+/** Узел хода канала: точка по id ('LI-20', отражение — 'LI-20:m') или промежуточная опора (ход между точками) */
 export type PathNode = string | Vec;
 
 export interface ViewDef {

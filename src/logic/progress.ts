@@ -51,9 +51,19 @@ export function loadProgress(): Progress {
     const raw = localStorage.getItem(KEY);
     if (!raw) return EMPTY_PROGRESS;
     const parsed = JSON.parse(raw) as Partial<Progress>;
+    // Битые записи пар отбрасываем: иначе уровень станет NaN и больше не исправится
+    const pairs: Record<string, PairStats> = {};
+    if (parsed.pairs && typeof parsed.pairs === 'object') {
+      for (const [key, v] of Object.entries(parsed.pairs as Record<string, Partial<PairStats>>)) {
+        const ok = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n) && n >= 0;
+        if (v && ok(v.level) && ok(v.seen) && ok(v.correct)) {
+          pairs[key] = { level: Math.min(MAX_LEVEL, Math.floor(v.level)), seen: v.seen, correct: v.correct };
+        }
+      }
+    }
     return {
-      pairs: parsed.pairs && typeof parsed.pairs === 'object' ? parsed.pairs : {},
-      unlocked: Array.isArray(parsed.unlocked) ? parsed.unlocked : [],
+      pairs,
+      unlocked: Array.isArray(parsed.unlocked) ? parsed.unlocked.filter((id) => typeof id === 'string') : [],
     };
   } catch {
     return EMPTY_PROGRESS;

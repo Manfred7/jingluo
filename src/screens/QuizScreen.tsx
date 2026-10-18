@@ -43,6 +43,12 @@ export function QuizScreen({ pool, length, directions, levelOf, onRecord, onFini
   const [results, setResults] = useState<SessionResult[]>([]);
   const [answer, setAnswer] = useState<Answer>();
   const timerRef = useRef<number | undefined>(undefined);
+  // Актуальные значения для перехода: таймер захвачен рендером до onRecord
+  const latestRef = useRef({ pool, directions, shownIds, levelOf, length, onFinish });
+
+  useEffect(() => {
+    latestRef.current = { pool, directions, shownIds, levelOf, length, onFinish };
+  });
 
   useEffect(() => {
     return () => {
@@ -55,6 +61,7 @@ export function QuizScreen({ pool, length, directions, levelOf, onRecord, onFini
       window.clearTimeout(timerRef.current);
       timerRef.current = undefined;
     }
+    const { pool, directions, shownIds, levelOf, length, onFinish } = latestRef.current;
     if (answered.length >= length) {
       onFinish(answered);
       return;
@@ -114,6 +121,10 @@ export function QuizScreen({ pool, length, directions, levelOf, onRecord, onFini
 
   const point = pointById(question.pointId);
   const placement = placementFor(question.pointId);
+  // Только сама точка, без отражения на симметричных видах
+  const marker = placement
+    ? placement.placed.filter((placed) => placed.pointId === question.pointId && !placed.mirrored)
+    : [];
   const isMarker = question.direction.startsWith('marker>');
   const toName = question.direction.endsWith('>name');
   const ask = toName ? 'Как называется точка?' : 'Какой код у точки?';
@@ -129,9 +140,8 @@ export function QuizScreen({ pool, length, directions, levelOf, onRecord, onFini
             <Figure
               className="quiz__figure"
               view={placement.view}
-              placed={placement.placed}
+              placed={marker}
               channels={[]}
-              showPoint={(id) => id === question.pointId}
               selectedId={question.pointId}
             />
           </div>

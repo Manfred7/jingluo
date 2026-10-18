@@ -29,6 +29,12 @@ export function LocateScreen({ pool, length, levelOf, onRecord, onFinish, onExit
   const answeredRef = useRef(false);
   const timerRef = useRef<number | undefined>(undefined);
   const svgRef = useRef<SVGSVGElement>(null);
+  // Актуальные значения для перехода: таймер захвачен рендером до onRecord
+  const latestRef = useRef({ sessionPool, shownIds, levelOf, length, onFinish });
+
+  useEffect(() => {
+    latestRef.current = { sessionPool, shownIds, levelOf, length, onFinish };
+  });
 
   useEffect(() => {
     return () => {
@@ -41,6 +47,7 @@ export function LocateScreen({ pool, length, levelOf, onRecord, onFinish, onExit
       window.clearTimeout(timerRef.current);
       timerRef.current = undefined;
     }
+    const { sessionPool, shownIds, levelOf, length, onFinish } = latestRef.current;
     if (answered.length >= length) {
       onFinish(answered);
       return;
@@ -138,6 +145,7 @@ export function LocateScreen({ pool, length, levelOf, onRecord, onFinish, onExit
           showPoint={() => false}
           onBackgroundDown={tapFigure}
           svgRef={svgRef}
+          touch
           className="locate__figure"
           overlay={
             answer && (

@@ -46,10 +46,15 @@ export function pathOf(view: ViewDef, channel: ChannelId, placed: Placed[]): Vec
   const first = raw[0];
   const isBranches = Array.isArray(first) && (typeof first[0] === 'string' || Array.isArray(first[0]));
   const branches = (isBranches ? raw : [raw]) as PathNode[][];
-  const at = new Map(placed.filter((p) => !p.mirrored).map((p) => [p.pointId, p.pos]));
+  // 'LI-20' — сама точка, 'LI-20:m' — её отражение на другой стороне (канал переходит на неё)
+  const at = new Map(placed.map((p) => [p.mirrored ? `${p.pointId}:m` : p.pointId, p.pos]));
   return branches.map((nodes) => nodes.flatMap((n) => (typeof n === 'string' ? (at.has(n) ? [at.get(n)!] : []) : [n])));
 }
 
 /** Виды, где у канала есть точки или ход */
 export const viewsOfChannel = (channel: ChannelId) =>
-  VIEWS.filter((v) => v.paths[channel] || Object.keys(v.computed).some((id) => id.startsWith(`${channel}-`)));
+  VIEWS.filter(
+    (v) =>
+      v.paths[channel] ||
+      [...Object.keys(v.computed), ...Object.keys(OVERRIDES[v.id] ?? {})].some((id) => id.startsWith(`${channel}-`)),
+  );

@@ -1,7 +1,7 @@
 import { CHANNELS } from '../data/channels';
 import { POINTS, pointsOf } from '../data/points';
-import { TRACK } from './modes';
-import { type Progress, UNLOCK_SHARE, mastery } from './progress';
+import { QUIZ_DIRECTIONS, TRACK } from './modes';
+import { levelOf, MASTERED_LEVEL, type Progress, UNLOCK_SHARE } from './progress';
 
 export interface Deck {
   id: string;
@@ -32,9 +32,15 @@ export const deckById = (id: string) => DECKS.find((d) => d.id === id) ?? DECKS[
 
 export const deckPoints = (deck: Deck) => deck.pointIds.flatMap((id) => POINTS.filter((p) => p.id === id));
 
-/** Освоение колоды — лучшее из «Место → название» и «Отметь точку» */
-export const deckMastery = (p: Progress, deck: Deck) =>
-  Math.max(mastery(p, deck.pointIds, TRACK.quiz('marker>name')), mastery(p, deck.pointIds, TRACK.locate));
+/** Режимы, где прогресс ведётся по точкам («Узнай канал» — по каналам, в освоение колоды не входит) */
+const POINT_TRACKS = [...QUIZ_DIRECTIONS.map((d) => TRACK.quiz(d.id)), TRACK.compose, TRACK.locate];
+
+/** Освоение колоды: доля точек, освоенных хотя бы в одном режиме с точками */
+export function deckMastery(p: Progress, deck: Deck): number {
+  if (!deck.pointIds.length) return 0;
+  const mastered = deck.pointIds.filter((id) => POINT_TRACKS.some((t) => levelOf(p, id, t) >= MASTERED_LEVEL));
+  return mastered.length / deck.pointIds.length;
+}
 
 export const isUnlocked = (deck: Deck, p: Progress, unlockAll: boolean) =>
   unlockAll || !deck.requires || p.unlocked.includes(deck.id);

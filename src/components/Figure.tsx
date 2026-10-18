@@ -17,14 +17,23 @@ interface Props {
   labels?: (pointId: string) => string | undefined;
   onPointDown?: (pointId: string, mirrored: boolean, e: ReactPointerEvent) => void;
   onBackgroundDown?: (e: ReactPointerEvent<SVGSVGElement>) => void;
+  /**
+   * Фигура принимает нажатия пальцем (режим «Отметь точку», редактор): добавляет на <svg> класс `figure--touch`
+   * (в нём `touch-action: none` — палец не прокручивает страницу). По умолчанию false — на фигуре можно прокручивать.
+   */
+  touch?: boolean;
   svgRef?: Ref<SVGSVGElement>;
   className?: string;
   overlay?: ReactNode;
 }
 
+/** Радиус выбора точки, px экрана (≥44 px мишень на касание) */
+const HIT_RADIUS_PX = 22;
+
 /**
  * Вид тела: контур объединения форм (обводка всех форм снизу, заливка сверху),
- * ориентиры, ход каналов и точки. Мишень у точки шире маркера — под палец.
+ * ориентиры, ход каналов и точки. Нажатие разбирается на всём <svg>: выбирается
+ * ближайшая к пальцу видимая точка в радиусе HIT_RADIUS_PX экранных пикселей.
  */
 export function Figure({
   view,
@@ -36,20 +45,51 @@ export function Figure({
   labels,
   onPointDown,
   onBackgroundDown,
+  touch = false,
   svgRef,
   className,
   overlay,
 }: Props) {
   const outlines = view.shapes.map(shapePath);
   const visible = placed.filter((p) => showPoint(p.pointId));
+
+  const handlePointerDown = (e: ReactPointerEvent<SVGSVGElement>) => {
+    const svg = e.currentTarget;
+    const ctm = svg.getScreenCTM();
+    let nearest: Placed | undefined;
+    if (ctm) {
+      // Нажатие в координаты viewBox, радиус из px экрана — через масштаб CTM
+      const point = svg.createSVGPoint();
+      point.x = e.clientX;
+      point.y = e.clientY;
+      const at = point.matrixTransform(ctm.inverse());
+      const radius = HIT_RADIUS_PX / ctm.a;
+      let best = radius * radius;
+      for (const p of visible) {
+        const dx = p.pos[0] - at.x;
+        const dy = p.pos[1] - at.y;
+        const dist2 = dx * dx + dy * dy;
+        if (dist2 <= best) {
+          best = dist2;
+          nearest = p;
+        }
+      }
+    }
+    if (nearest) {
+      if (onPointDown) onPointDown(nearest.pointId, !!nearest.mirrored, e);
+    } else if (onBackgroundDown) {
+      onBackgroundDown(e);
+    }
+  };
+
   return (
     <svg
       ref={svgRef}
-      className={`figure ${className ?? ''}`}
+      className={`figure${touch ? ' figure--touch' : ''} ${className ?? ''}`}
       viewBox={`0 0 ${view.width} ${view.height}`}
       role="img"
       aria-label={view.title}
-      onPointerDown={onBackgroundDown}
+      onPointerDown={onPointDown || onBackgroundDown ? handlePointerDown : undefined}
     >
       <g className="figure__outline">
         {outlines.map((d, i) => (
@@ -87,14 +127,6 @@ export function Figure({
           <g
             key={`${p.pointId}${p.mirrored ? ':m' : ''}`}
             className={`figure__point ${selected ? 'is-selected' : ''} ${p.mirrored ? 'is-mirrored' : ''}`}
-            onPointerDown={
-              onPointDown
-                ? (e) => {
-                    e.stopPropagation();
-                    onPointDown(p.pointId, !!p.mirrored, e);
-                  }
-                : undefined
-            }
           >
             <circle className="figure__hit" cx={x} cy={y} r={14} />
             {selected && <circle className="figure__halo" cx={x} cy={y} r={11} />}
