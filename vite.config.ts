@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 
 type Overrides = Record<string, Record<string, [number, number]>>
 
@@ -110,8 +111,56 @@ const placementsPlugin: Plugin = {
   },
 }
 
-// Пока только локально: dev-сервер на компьютере, с телефона — `npm run dev:lan` по Wi-Fi.
-// PWA и base для публикации подключим, когда (если) решим выкладывать — конфиг есть в bazi-trainer.
-export default defineConfig({
-  plugins: [react(), placementsPlugin],
-})
+const YEAR = 60 * 60 * 24 * 365
+
+// Публикация — GitHub Pages из подпапки /jingluo/ (и vite preview тоже); dev-сервер остаётся в корне.
+// Редактор ?edit и плагин записи — только в dev-сервере, в сборку не попадают.
+export default defineConfig(({ command, isPreview }) => ({
+  plugins: [
+    react(),
+    placementsPlugin,
+    VitePWA({
+      // Новая версия ставится сама при следующем открытии
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg', 'favicon.ico', 'apple-touch-icon-180x180.png'],
+      manifest: {
+        name: 'Каналы — тренажёр точек акупунктуры',
+        short_name: 'Каналы',
+        description: 'Тренажёр каналов и точек акупунктуры: найти точку на фигуре, узнать канал и название',
+        lang: 'ru',
+        display: 'standalone',
+        orientation: 'portrait',
+        background_color: '#F5F0E6',
+        theme_color: '#F5F0E6',
+        icons: [
+          { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
+          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+      workbox: {
+        // Всё приложение кладётся в кэш при установке — дальше работает без сети
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,json}'],
+        runtimeCaching: [
+          {
+            // Шрифты Google: стили и файлы кэшируются при первом показе
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/,
+            handler: 'StaleWhileRevalidate',
+            options: { cacheName: 'google-fonts-css' },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-files',
+              expiration: { maxEntries: 200, maxAgeSeconds: YEAR },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
+      },
+    }),
+  ],
+  base: command === 'build' || isPreview ? '/jingluo/' : '/',
+}))

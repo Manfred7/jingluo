@@ -1,0 +1,16 @@
+import { defineConfig, minimal2023Preset } from '@vite-pwa/assets-generator/config';
+
+// Иконки приложения из public/pwa-icon.svg: `npm run icons`
+// Киноварь, на иконке 經絡 в строку (scripts/build-icon.mjs)
+const background = '#B23A2B';
+
+export default defineConfig({
+  headLinkOptions: { preset: '2023' },
+  preset: {
+    ...minimal2023Preset,
+    // Поля уже заложены в pwa-icon.svg (знаки в безопасной зоне), лишние отступы генератора делают их мелкими
+    maskable: { ...minimal2023Preset.maskable, padding: 0.1, resizeOptions: { background } },
+    apple: { ...minimal2023Preset.apple, padding: 0, resizeOptions: { background } },
+  },
+  images: ['public/pwa-icon.svg'],
+});

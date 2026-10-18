@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { CHANNELS, type ChannelId } from '../data/channels';
 import { POINTS, pointsOf } from '../data/points';
 import { DECKS, deckMastery, isUnlocked } from '../logic/decks';
+import { useInstall } from '../logic/install';
 import { MODES, QUIZ_DIRECTIONS, type QuizDirection, SESSION_LENGTHS } from '../logic/modes';
 import type { Progress } from '../logic/progress';
 import type { Settings } from '../logic/settings';
@@ -23,6 +24,7 @@ export function StartScreen({ settings, progress, onSettings, onChannel, onStart
   const mode = MODES.find((m) => m.id === settings.mode) ?? MODES[0];
   const deck = DECKS.find((d) => d.id === settings.deckId) ?? DECKS[0];
   const deckOpen = isUnlocked(deck, progress, settings.unlockAll);
+  const { canInstall, iosHint, install } = useInstall();
 
   // Выбранная колода закрылась (сняли «Открыть все» или сбросили прогресс) — вернуться к первой, она открыта всегда
   useEffect(() => {
@@ -125,6 +127,15 @@ export function StartScreen({ settings, progress, onSettings, onChannel, onStart
         </>
       )}
 
+      {canInstall && (
+        <button className="btn btn--wide" onClick={install}>
+          Установить на устройство
+        </button>
+      )}
+      {iosHint && (
+        <p className="muted start__hint">Чтобы установить на iPhone: «Поделиться» → «На экран „Домой“». Работает и без интернета.</p>
+      )}
+
       <section className="panel" aria-label="Тема">
         <div className="segmented">
           {THEMES.map((t) => (
@@ -137,6 +148,10 @@ export function StartScreen({ settings, progress, onSettings, onChannel, onStart
           Сбросить прогресс
         </button>
       </section>
+
+      <p className="muted start__hint">
+        Учебный тренажёр для запоминания мест и названий точек. Не медицинская рекомендация и не руководство к лечению.
+      </p>
     </main>
   );
 }
