@@ -1,7 +1,7 @@
 import type { ChannelId } from '../data/channels';
 import type { Shape, Vec } from './geometry';
 
-export type ViewId = 'front' | 'arm-palmar' | 'arm-dorsal' | 'leg-lateral' | 'leg-medial';
+export type ViewId = 'front' | 'back' | 'head-front' | 'head-side' | 'arm-palmar' | 'arm-dorsal' | 'leg-lateral' | 'leg-medial';
 
 /** Узел хода канала: точка по id или промежуточная опора (ход между точками) */
 export type PathNode = string | Vec;
@@ -21,6 +21,6 @@ export interface ViewDef {
   mirrorX?: number;
   /** Места точек по формулам (цуни от ориентиров); правки из редактора лежат в placements.json */
   computed: Record<string, Vec>;
-  /** Ход каналов на этом виде */
-  paths: Partial<Record<ChannelId, PathNode[]>>;
+  /** Ход каналов на этом виде: одна линия или несколько ветвей (у BL на спине — две) */
+  paths: Partial<Record<ChannelId, PathNode[] | PathNode[][]>>;
 }

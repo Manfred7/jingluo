@@ -67,13 +67,17 @@ export function Figure({
         ))}
       </g>
 
-      {channels.map((ch) => {
-        const pts = pathOf(view, ch, placed);
-        if (pts.length < 2) return null;
-        return (
-          <path key={ch} className={`figure__channel ${ch === activeChannel ? 'is-active' : ''}`} d={smoothPath(pts)} />
-        );
-      })}
+      {channels.flatMap((ch) =>
+        pathOf(view, ch, placed)
+          .filter((pts) => pts.length > 1)
+          .map((pts, i) => (
+            <path
+              key={`${ch}:${i}`}
+              className={`figure__channel ${ch === activeChannel ? 'is-active' : ''}`}
+              d={smoothPath(pts)}
+            />
+          )),
+      )}
 
       {visible.map((p) => {
         const [x, y] = p.pos;

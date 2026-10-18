@@ -2,13 +2,16 @@ import type { ChannelId } from '../data/channels';
 import placementsJson from '../data/placements.json';
 import { armDorsal } from './armDorsal';
 import { armPalmar } from './armPalmar';
+import { back } from './back';
 import { front } from './front';
+import { headFront } from './headFront';
+import { headSide } from './headSide';
 import { legLateral } from './legLateral';
 import { legMedial } from './legMedial';
 import { mirror, type Vec } from './geometry';
 import type { PathNode, ViewDef, ViewId } from './types';
 
-export const VIEWS: ViewDef[] = [front, armPalmar, armDorsal, legLateral, legMedial];
+export const VIEWS: ViewDef[] = [front, back, headFront, headSide, armPalmar, armDorsal, legLateral, legMedial];
 
 export const viewById = (id: ViewId) => VIEWS.find((v) => v.id === id)!;
 
@@ -35,10 +38,16 @@ export function placementsOf(view: ViewDef, overrides: Overrides = OVERRIDES, bi
   return [...list, ...list.filter((p) => bilateral(p.pointId)).map((p) => ({ ...p, pos: mirror(p.pos, axis), mirrored: true }))];
 }
 
-export function pathOf(view: ViewDef, channel: ChannelId, placed: Placed[]): Vec[] {
-  const nodes: PathNode[] = view.paths[channel] ?? [];
+/** Ход канала на виде — ветви как списки координат */
+export function pathOf(view: ViewDef, channel: ChannelId, placed: Placed[]): Vec[][] {
+  const raw = view.paths[channel];
+  if (!raw?.length) return [];
+  // Ветви — список списков: первый элемент сам список узлов (а не точка-id или координата [x, y])
+  const first = raw[0];
+  const isBranches = Array.isArray(first) && (typeof first[0] === 'string' || Array.isArray(first[0]));
+  const branches = (isBranches ? raw : [raw]) as PathNode[][];
   const at = new Map(placed.filter((p) => !p.mirrored).map((p) => [p.pointId, p.pos]));
-  return nodes.flatMap((n) => (typeof n === 'string' ? (at.has(n) ? [at.get(n)!] : []) : [n]));
+  return branches.map((nodes) => nodes.flatMap((n) => (typeof n === 'string' ? (at.has(n) ? [at.get(n)!] : []) : [n])));
 }
 
 /** Виды, где у канала есть точки или ход */
