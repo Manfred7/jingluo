@@ -1,0 +1,11 @@
+node_modules
+dist
+*.local
+*.log
+.DS_Store
+.idea
+.vscode/*
+
+# Сканы и PDF книг и атласов — материал с авторскими правами, в git не кладём
+*.pdf
+private/

@@ -1,0 +1,237 @@
+/* Палитра и типографика — как в sign-trainer / bazi-trainer: рисовая бумага, тушь, киноварь */
+:root {
+  --bg: #f5f0e6;
+  --surface: #fbf8f1;
+  --ink: #1c1c1c;
+  --muted: #6b645a;
+  --border: #e3dacb;
+  --accent: #b23a2b;
+  --accent-ink: #fbf8f1;
+  --ok: #4f7c5c;
+  --ok-bg: #e4ede3;
+  --bad: #a34a3a;
+  --bad-bg: #f3e1dc;
+  --shadow: 0 1px 2px rgb(60 40 20 / 6%), 0 8px 24px rgb(60 40 20 / 8%);
+
+  --font-ui: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Noto Serif', Georgia, serif;
+  --font-hanzi: 'Noto Serif SC', 'Songti SC', serif;
+
+  color-scheme: light;
+}
+
+/* Тёмная тема: data-theme ставит src/logic/theme.ts (и скрипт в index.html до первой отрисовки) */
+:root[data-theme='dark'] {
+  --bg: #161514;
+  --surface: #211f1c;
+  --ink: #ede6d6;
+  --muted: #9a9284;
+  --border: #34302a;
+  --accent: #d2574a;
+  --accent-ink: #161514;
+  --ok: #7fae8a;
+  --ok-bg: #22302a;
+  --bad: #d27a6a;
+  --bad-bg: #3a2522;
+  --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 30%);
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  margin: 0;
+}
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.25rem;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  /* Быстрые нажатия подряд не увеличивают страницу (iOS) */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.muted {
+  color: var(--muted);
+  margin: 0;
+}
+.hanzi {
+  font-family: var(--font-hanzi);
+}
+
+/* ---------- Каркас ---------- */
+
+.screen {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 16px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  color: var(--muted);
+  flex: none;
+}
+.icon-btn:hover {
+  background: var(--surface);
+}
+
+/* Переключатель из нескольких кнопок (тема) */
+.segmented {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.segmented button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px 4px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.segmented button[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+/* ---------- Старт ---------- */
+
+.start__hero {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0 8px;
+}
+.start__glyphs {
+  font-size: 1.75rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.draft-note {
+  font-size: 0.8125rem;
+  color: var(--bad);
+  background: var(--bad-bg);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 0;
+}
+
+/* ---------- Список каналов и точек ---------- */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.list li + li {
+  border-top: 1px solid var(--border);
+}
+
+.channel-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 3.5rem 1fr auto;
+  align-items: baseline;
+  gap: 8px;
+  padding: 12px 4px;
+  border: none;
+  background: transparent;
+  text-align: left;
+}
+.channel-row__code {
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.channel-row__count {
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.point-row {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr auto;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 4px;
+}
+.point-row__code {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.point-row__name {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+}
+.point-row__hanzi {
+  font-size: 1.25rem;
+}
+.point-row__who {
+  grid-column: 2 / 4;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: -6px;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
