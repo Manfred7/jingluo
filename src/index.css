@@ -641,3 +641,62 @@ button.point-row:disabled {
   background: var(--accent);
   transition: width 0.3s;
 }
+
+/* ---------- Старт: режимы и колоды ---------- */
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.mode-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  border-radius: 12px;
+  padding: 10px 4px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.mode-btn[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.start__hint {
+  font-size: 0.8125rem;
+  text-align: center;
+}
+.deck-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 4px;
+  border: none;
+  background: transparent;
+  text-align: left;
+}
+.deck-row.is-selected {
+  color: var(--accent);
+  font-weight: 600;
+}
+.deck-row:disabled {
+  cursor: default;
+  color: var(--muted);
+}
+.deck-row__pct {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9375rem;
+}
+.check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}

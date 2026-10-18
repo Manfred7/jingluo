@@ -1,0 +1,76 @@
+.locate {
+  gap: 12px;
+}
+
+.locate__task {
+  min-height: 0;
+  padding: 12px 16px;
+  gap: 8px;
+}
+
+.locate__point {
+  width: 100%;
+  padding: 0;
+}
+
+.locate__figure-wrap {
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.locate__figure {
+  width: 100%;
+  /* карточка задания + фигура + вердикт с «Дальше» умещаются на экране телефона */
+  max-height: 58dvh;
+  cursor: crosshair;
+}
+
+.locate__overlay {
+  pointer-events: none;
+}
+
+.locate__target-halo {
+  fill: var(--accent);
+  opacity: 0.18;
+}
+
+.locate__target {
+  fill: var(--accent);
+  stroke: var(--surface);
+  stroke-width: 1.5;
+}
+
+.locate__tap {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.locate__tap--ok {
+  stroke: var(--ok);
+}
+
+.locate__tap--bad {
+  stroke: var(--bad);
+}
+
+.locate__feedback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  font-size: 0.9375rem;
+}
+
+.locate__feedback--ok {
+  color: var(--ok);
+}
+
+.locate__feedback--bad {
+  color: var(--bad);
+}

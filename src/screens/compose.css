@@ -1,0 +1,103 @@
+.compose {
+  gap: 16px;
+}
+
+.compose__card {
+  min-height: 0;
+  padding: 16px;
+  gap: 12px;
+}
+
+.compose__figure {
+  max-height: 45dvh;
+}
+
+.compose__figure .figure__hit {
+  cursor: default;
+}
+
+.compose__steps > .card__prompt {
+  text-align: center;
+}
+
+.compose__channels {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.compose__channel {
+  min-width: 0;
+  min-height: 76px;
+  padding: 18px 4px 8px;
+  flex-direction: column;
+  gap: 3px;
+  font-family: var(--font-ui);
+  line-height: 1.2;
+}
+
+.compose__channel-code {
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.compose__channel-name {
+  color: var(--muted);
+  font-size: 0.625rem;
+  font-weight: 400;
+  overflow-wrap: break-word;
+}
+
+.compose__feedback {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: center;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.compose__feedback--ok {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+.compose__feedback--bad {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+
+.compose__numbers {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.compose__number {
+  font-family: var(--font-ui);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.compose__verdict {
+  margin: 0;
+  font-weight: 600;
+}
+
+.compose__verdict--ok {
+  color: var(--ok);
+}
+
+.compose__verdict--bad {
+  color: var(--bad);
+}
+
+.compose__point {
+  width: 100%;
+  padding: 0;
+}
+
+@media (min-width: 420px) {
+  .compose__channels {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
