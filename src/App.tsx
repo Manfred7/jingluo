@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { ChannelId } from './data/channels';
+import { type ChannelId, channelById } from './data/channels';
 import type { Point } from './data/points';
 import { type Deck, deckById, deckMastery, deckPoints, withUnlocks } from './logic/decks';
 import type { Mode } from './logic/modes';
@@ -9,6 +9,7 @@ import { loadSettings, saveSettings, type Settings } from './logic/settings';
 import { watchTheme } from './logic/theme';
 import { ChannelQuizScreen } from './screens/ChannelQuizScreen';
 import { ChannelScreen } from './screens/ChannelScreen';
+import { LevelsScreen } from './screens/LevelsScreen';
 import { ComposeScreen } from './screens/ComposeScreen';
 import { LocateScreen } from './screens/LocateScreen';
 import { QuizScreen } from './screens/QuizScreen';
@@ -76,7 +77,10 @@ export default function App() {
         onRetryMistakes={(ids) => {
           // в «Узнай канал» ошибки — каналы: повторяем их точки из той же колоды
           const wrong = new Set(ids);
-          const pool = session.pool.filter((p) => wrong.has(p.id) || wrong.has(p.channel));
+          // в «Уровнях» ошибки — каналы и уровни (Шао-ян…): повторяем точки этих каналов
+          const pool = session.pool.filter(
+            (p) => wrong.has(p.id) || wrong.has(p.channel) || wrong.has(channelById(p.channel).level ?? ''),
+          );
           startSession(session.mode, session.deck, pool.length ? pool : session.pool);
         }}
         onRestart={() => startSession(session.mode, session.deck, deckPoints(session.deck))}
@@ -122,6 +126,8 @@ export default function App() {
         return <ComposeScreen key={session.key} {...props} />;
       case 'channel':
         return <ChannelQuizScreen key={session.key} {...props} />;
+      case 'levels':
+        return <LevelsScreen key={session.key} {...props} />;
       case 'locate':
         return <LocateScreen key={session.key} {...props} />;
     }

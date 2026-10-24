@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { CHANNELS, type ChannelId } from '../data/channels';
+import type { ChannelId } from '../data/channels';
+import { GROUPINGS, groupChannels } from '../data/groups';
 import { POINTS, pointsOf } from '../data/points';
 import { DECKS, deckMastery, isUnlocked } from '../logic/decks';
 import { useInstall } from '../logic/install';
@@ -60,17 +61,35 @@ export function StartScreen({ settings, progress, onSettings, onChannel, onStart
 
       {mode.id === 'atlas' ? (
         <section className="panel" aria-label="Каналы">
-          <ul className="list">
-            {CHANNELS.map((c) => (
-              <li key={c.id}>
-                <button className="channel-row" onClick={() => onChannel(c.id)}>
-                  <span className="channel-row__code">{c.code}</span>
-                  <span>{c.name}</span>
-                  <span className="channel-row__count">{pointsOf(c.id).length}</span>
-                </button>
-              </li>
+          <div className="segmented">
+            {GROUPINGS.map((g) => (
+              <button key={g.id} aria-pressed={settings.grouping === g.id} onClick={() => onSettings({ grouping: g.id })}>
+                {g.label}
+              </button>
             ))}
-          </ul>
+          </div>
+          {groupChannels(settings.grouping).map((group) => (
+            <div key={group.title} className="channel-group">
+              <h3 className="channel-group__title">
+                {group.title}
+                {group.note && <span className="channel-group__note">{group.note}</span>}
+              </h3>
+              <ul className="list">
+                {group.channels.map((c) => (
+                  <li key={c.id}>
+                    <button className="channel-row" onClick={() => onChannel(c.id)}>
+                      <span className="channel-row__code">{c.code}</span>
+                      <span>
+                        {c.name}
+                        {c.limb && <span className="channel-row__limb"> · {c.limb === 'hand' ? 'рука' : 'нога'}</span>}
+                      </span>
+                      <span className="channel-row__count">{pointsOf(c.id).length}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </section>
       ) : (
         <>

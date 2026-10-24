@@ -1,3 +1,4 @@
+import { GROUPINGS, type GroupingId } from '../data/groups';
 import { DECKS } from './decks';
 import { MODES, type Mode, QUIZ_DIRECTIONS, type QuizDirection, SESSION_LENGTHS } from './modes';
 import { THEMES, type Theme } from './theme';
@@ -12,6 +13,8 @@ export interface Settings {
   directions: QuizDirection[];
   /** Все колоды доступны сразу, без порога */
   unlockAll: boolean;
+  /** Группировка каналов в атласе */
+  grouping: GroupingId;
 }
 
 const KEY = 'jingluo:settings';
@@ -23,6 +26,7 @@ const DEFAULTS: Settings = {
   length: 20,
   directions: ['marker>name'],
   unlockAll: false,
+  grouping: 'circle',
 };
 
 export function loadSettings(): Settings {
@@ -39,6 +43,7 @@ export function loadSettings(): Settings {
       length: SESSION_LENGTHS.includes(parsed.length ?? 0) ? parsed.length! : DEFAULTS.length,
       directions: directions.length ? directions : DEFAULTS.directions,
       unlockAll: parsed.unlockAll === true,
+      grouping: GROUPINGS.some((g) => g.id === parsed.grouping) ? parsed.grouping! : DEFAULTS.grouping,
     };
   } catch {
     return DEFAULTS;

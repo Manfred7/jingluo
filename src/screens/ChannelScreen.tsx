@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Figure } from '../components/Figure';
-import { type ChannelId, channelById } from '../data/channels';
+import { type ChannelId, channelById, fullName } from '../data/channels';
 import { POINTS, pointById, pointsOf } from '../data/points';
 import type { ViewId } from '../figures/types';
 import { placementsOf, viewsOfChannel } from '../figures/views';
@@ -39,9 +39,14 @@ export function ChannelScreen({ channel, onBack }: Props) {
         <button className="icon-btn" onClick={onBack} aria-label="Назад">
           ←
         </button>
-        <h2>
-          {ch.code} · {ch.name}
-        </h2>
+        <div>
+          <h2>
+            {ch.code} · {ch.name}
+          </h2>
+          <p className="muted channel-title__full">
+            {fullName(ch)} <span className="hanzi">{ch.fullHanzi}</span>
+          </p>
+        </div>
       </div>
 
       {view ? (

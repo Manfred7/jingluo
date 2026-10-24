@@ -1,11 +1,12 @@
 /** Режимы стартового экрана */
-export type Mode = 'atlas' | 'quiz' | 'compose' | 'channel' | 'locate';
+export type Mode = 'atlas' | 'quiz' | 'compose' | 'channel' | 'levels' | 'locate';
 
 export const MODES: { id: Mode; label: string; hint: string }[] = [
   { id: 'atlas', label: 'Атлас', hint: 'Каналы и точки на фигуре, без проверки' },
   { id: 'quiz', label: 'Узнай точку', hint: 'Маркер на фигуре — выбрать название или код из четырёх' },
   { id: 'compose', label: 'Состав', hint: 'Маркер на фигуре — выбрать канал, затем номер' },
   { id: 'channel', label: 'Узнай канал', hint: 'Подсвечена линия — какой это канал' },
+  { id: 'levels', label: 'Уровни', hint: 'Шесть уровней: Тай-ян, Шао-ян, Шао-инь… — какие каналы в паре' },
   { id: 'locate', label: 'Отметь точку', hint: 'Дано название — нажать на место точки на фигуре' },
 ];
 
@@ -27,6 +28,7 @@ export const TRACK = {
   quiz: (d: QuizDirection) => `quiz:${d}`,
   compose: 'compose',
   channel: 'channel',
+  levels: 'levels',
   locate: 'locate',
 } as const;
 

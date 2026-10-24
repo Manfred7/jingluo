@@ -704,3 +704,44 @@ button.point-row:disabled {
   height: 18px;
   accent-color: var(--accent);
 }
+
+/* ---------- Атлас: разделы каналов ---------- */
+
+.channel-group + .channel-group {
+  margin-top: 4px;
+}
+.channel-group__title {
+  margin: 8px 4px 0;
+  font-family: var(--font-serif);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.channel-group__note {
+  font-family: var(--font-hanzi);
+  font-weight: 400;
+  color: var(--muted);
+}
+.channel-row__limb {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+.channel-title__full {
+  font-size: 0.8125rem;
+}
+
+/* ---------- Режим «Уровни» ---------- */
+
+.levels__reveal {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.875rem;
+  text-align: center;
+}
+.levels__reveal strong {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+}

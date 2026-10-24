@@ -1,4 +1,4 @@
-import { CHANNELS } from '../data/channels';
+import { CHANNELS, LEVELS } from '../data/channels';
 import { pointById } from '../data/points';
 import type { SessionResult } from '../logic/quizTypes';
 
@@ -60,6 +60,7 @@ export function ResultScreen({ results, summary, onRetryMistakes, onRestart, onM
             {hardest.map(([id, times]) => {
               const point = pointById(id);
               const channel = point ? undefined : CHANNELS.find((c) => c.id === id);
+              const level = point || channel ? undefined : LEVELS.find((l) => l.id === id);
               return (
                 <li key={id}>
                   <span className="mistakes__char">
@@ -69,7 +70,7 @@ export function ResultScreen({ results, summary, onRetryMistakes, onRestart, onM
                       </>
                     ) : (
                       <>
-                        <strong>{channel?.code ?? id}</strong> {channel?.name}
+                        <strong>{channel?.code ?? level?.name ?? id}</strong> {channel?.name ?? level?.meaning}
                       </>
                     )}
                   </span>
