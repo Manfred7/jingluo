@@ -239,11 +239,31 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /* Фигура закреплена сверху: список точек прокручивается под ней, отметить точку можно в любой момент */
+  .editor__figure-panel {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 8px;
+    box-shadow: var(--shadow);
+  }
+
   .editor__figure {
-    max-height: 70dvh;
+    max-height: 42dvh;
+  }
+
+  .editor__figure-panel > .editor__hint {
+    margin-top: 4px;
+    font-size: 0.75rem;
   }
 
   .editor__panel {
+    max-height: none;
+    overflow: visible;
+  }
+
+  /* Под закреплённой фигурой листается сама страница — без второй прокрутки внутри списка */
+  .editor__point-list {
     max-height: none;
     overflow: visible;
   }

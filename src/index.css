@@ -317,6 +317,16 @@ button:focus-visible {
   stroke-width: 3px;
 }
 
+/* Атлас: фигура с карточкой точки закреплена сверху, список точек канала прокручивается под ней */
+.atlas {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  box-shadow: var(--shadow);
+}
+.atlas .figure {
+  max-height: 42dvh;
+}
 .atlas__hint {
   text-align: center;
   font-size: 0.875rem;
